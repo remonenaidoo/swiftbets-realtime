@@ -47,8 +47,11 @@ public sealed class HostTests : IClassFixture<HostTests.Factory>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-        builder.UseSetting("Kafka:BootstrapServers", "127.0.0.1:1");
-        builder.UseSetting("ConnectionStrings:Redis", "127.0.0.1:1,connectTimeout=200");
+            builder.UseSetting("Kafka:BootstrapServers", "127.0.0.1:1");
+            builder.UseSetting("ConnectionStrings:Redis", "127.0.0.1:1,connectTimeout=200");
+            builder.UseSetting("Jwt:Authority", "https://identity.test");
+            builder.UseSetting("Realtime:RunConsumers", "false");
+            builder.UseSetting("Realtime:RedisBackplane", "false");
         }
     }
 }

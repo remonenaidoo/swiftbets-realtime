@@ -4,6 +4,7 @@
   <ItemGroup>
     <PackageReference Include="SwiftBets.BuildingBlocks.Observability" />
     <PackageReference Include="SwiftBets.BuildingBlocks.Web" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" />
     <ProjectReference Include="../SwiftBets.Realtime.Infrastructure/SwiftBets.Realtime.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
