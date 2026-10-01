@@ -7,6 +7,7 @@ using SwiftBets.BuildingBlocks.Core;
 using SwiftBets.BuildingBlocks.Messaging;
 using SwiftBets.BuildingBlocks.Redis;
 using SwiftBets.Contracts.Messaging;
+using SwiftBets.Contracts.Offer;
 using SwiftBets.Contracts.Payout;
 using SwiftBets.Contracts.Placement;
 using SwiftBets.Contracts.Settlement;
@@ -31,6 +32,7 @@ public static class InfrastructureRegistration
         {
             // Live views only care about now: new groups start at the latest offset (D68). The group id is per
             // deployment, not per replica, so each event is pushed once and the Redis backplane fans it out.
+            Observe<FixtureChangedV1>(services, Topics.FixtureChanged, DeltaRouter.FixtureChanged);
             Observe<CouponPlacedV1>(services, Topics.CouponPlaced, DeltaRouter.Placed);
             Observe<CouponRejectedV1>(services, Topics.CouponRejected, DeltaRouter.Rejected);
             Observe<CouponSettledV1>(services, Topics.CouponSettled, DeltaRouter.Settled);

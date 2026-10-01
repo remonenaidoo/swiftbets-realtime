@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Offer;
 using SwiftBets.Contracts.Payout;
 using SwiftBets.Contracts.Placement;
 using SwiftBets.Contracts.Settlement;
@@ -12,6 +13,10 @@ namespace SwiftBets.Realtime.Application.Routing;
 /// </summary>
 public static class DeltaRouter
 {
+    /// <summary>A full fixture snapshot (prices and status): public, so it goes to everyone.</summary>
+    public static Route FixtureChanged(FixtureChangedV1 fixture) =>
+        new([LiveGroups.Offer, LiveGroups.Fixture(fixture.FixtureId)], "fixture-changed", fixture);
+
     public static Route Placed(CouponPlacedV1 placed) =>
         new([LiveGroups.Ops, LiveGroups.Punter(placed.PunterId), .. placed.Legs.Select(l => l.FixtureId).Distinct().Select(LiveGroups.Fixture)], "coupon-placed", placed);
 

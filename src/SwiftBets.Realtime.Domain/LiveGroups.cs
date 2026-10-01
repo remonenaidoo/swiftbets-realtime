@@ -8,6 +8,9 @@ public static class LiveGroups
 {
     public const string Ops = "ops";
 
+    /// <summary>Every connection: public prices and fixture status for the betting site.</summary>
+    public const string Offer = "offer";
+
     public static string Punter(Guid punterId) => $"punter:{punterId}";
 
     public static string Fixture(string fixtureId) => $"fixture:{fixtureId}";

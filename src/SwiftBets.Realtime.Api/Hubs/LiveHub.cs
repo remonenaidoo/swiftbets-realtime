@@ -17,6 +17,7 @@ public sealed class LiveHub : Hub
 
     public override async Task OnConnectedAsync()
     {
+        await Groups.AddToGroupAsync(Context.ConnectionId, LiveGroups.Offer);
         if (Guid.TryParse(Context.User?.FindFirst("sub")?.Value, out var subject))
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, LiveGroups.Punter(subject));
