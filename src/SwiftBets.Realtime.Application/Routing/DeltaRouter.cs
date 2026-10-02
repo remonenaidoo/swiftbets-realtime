@@ -42,6 +42,18 @@ public static class DeltaRouter
     public static Route Paid(PayoutCompletedV1 paid) =>
         new([LiveGroups.Ops, LiveGroups.Punter(paid.PunterId)], "payout-completed", paid);
 
+    /// <summary>A win for the public recent-winners ticker: the amount and a masked account, never the punter's id.</summary>
+    public static Route? PublicWin(PayoutCompletedV1 paid) =>
+        paid.Delta.MinorUnits <= 0
+            ? null
+            : new([LiveGroups.Offer], "win", new
+            {
+                paid.CouponId,
+                Account = "****" + paid.PunterId.ToString("N")[^4..],
+                Payout = paid.Delta,
+                PaidAt = paid.CompletedAt,
+            });
+
     public static Route Stuck(StuckCouponV1 stuck) => new([LiveGroups.Ops], "stuck-coupon", stuck);
 
     public static Route PayoutDeadLettered(PayoutAttemptV1 attempt) => new([LiveGroups.Ops], "payout-dead-lettered", attempt);

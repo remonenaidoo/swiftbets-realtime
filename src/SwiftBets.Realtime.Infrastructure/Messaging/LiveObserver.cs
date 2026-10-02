@@ -5,9 +5,18 @@ using SwiftBets.Realtime.Domain;
 
 namespace SwiftBets.Realtime.Infrastructure.Messaging;
 
-public sealed class LiveObserver<T>(PushDeltas push, Func<T, Route> route) : IEventHandler<T>
+/// <summary>Pushes every route an event produces; a null route means this audience gets nothing.</summary>
+public sealed class LiveObserver<T>(PushDeltas push, Func<T, IEnumerable<Route?>> routes) : IEventHandler<T>
     where T : IEventContract
 {
-    public Task HandleAsync(ConsumedEvent<T> message, CancellationToken cancellationToken) =>
-        push.PushAsync(route(message.Envelope.Payload), message.Envelope.OccurredAt, cancellationToken);
+    public async Task HandleAsync(ConsumedEvent<T> message, CancellationToken cancellationToken)
+    {
+        foreach (var route in routes(message.Envelope.Payload))
+        {
+            if (route is not null)
+            {
+                await push.PushAsync(route, message.Envelope.OccurredAt, cancellationToken);
+            }
+        }
+    }
 }
