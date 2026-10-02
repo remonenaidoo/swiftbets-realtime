@@ -37,7 +37,7 @@ public static class InfrastructureRegistration
             Observe<CouponPlacedV2>(services, Topics.CouponPlacedV2, DeltaRouter.Placed);
             Observe<CouponRejectedV1>(services, Topics.CouponRejected, DeltaRouter.Rejected);
             Observe<CouponSettledV2>(services, Topics.CouponSettledV2, DeltaRouter.Settled);
-            Observe<PayoutCompletedV1>(services, Topics.PayoutCompleted, DeltaRouter.Paid);
+            Observe<PayoutCompletedV1>(services, Topics.PayoutCompleted, p => [DeltaRouter.Paid(p), DeltaRouter.PublicWin(p)]);
             Observe<StuckCouponV1>(services, Topics.StuckCoupon, DeltaRouter.Stuck);
             Observe<PayoutAttemptV1>(services, Topics.PayoutDeadLetter, DeltaRouter.PayoutDeadLettered);
             Observe<MarketStatusChangedV1>(services, Topics.MarketStatusChanged, DeltaRouter.MarketStatusChanged);
@@ -51,9 +51,12 @@ public static class InfrastructureRegistration
     }
 
     private static void Observe<T>(IServiceCollection services, string topic, Func<T, Route> route)
+        where T : IEventContract => Observe<T>(services, topic, e => [route(e)]);
+
+    private static void Observe<T>(IServiceCollection services, string topic, Func<T, IEnumerable<Route?>> routes)
         where T : IEventContract
     {
-        services.AddScoped<IEventHandler<T>>(sp => new LiveObserver<T>(sp.GetRequiredService<PushDeltas>(), route));
+        services.AddScoped<IEventHandler<T>>(sp => new LiveObserver<T>(sp.GetRequiredService<PushDeltas>(), routes));
         services.AddSingleton<IHostedService>(sp => new KafkaConsumerHost<T>(
             new ConsumerRegistration(topic, $"swiftbets.realtime.{topic}", StartAtLatest: true),
             sp.GetRequiredService<IServiceScopeFactory>(),
