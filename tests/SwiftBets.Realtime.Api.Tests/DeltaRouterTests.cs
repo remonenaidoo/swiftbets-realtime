@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Risk;
 using SwiftBets.Contracts.Casino;
 using SwiftBets.Contracts.Money;
 using System.Text.Json;
@@ -79,4 +80,17 @@ public sealed class DeltaRouterTests
 
     private static CasinoTransactionV1 Casino() =>
         new(Guid.NewGuid(), "sim-seamless", "b-1", "r-1", Owner, "sun-temple", CasinoTransactionKind.Bet, new Money(100, "ZAR"), DateTimeOffset.UtcNow);
+
+    [Fact]
+    public void Liability_reaches_the_trader_view()
+    {
+        var route = DeltaRouter.Liability(new LiabilityChangedV1("f-1", 3, [], new Money(6_000, "ZAR"), DateTimeOffset.UtcNow));
+
+        (route.Groups.ShouldHaveSingleItem(), route.Type).ShouldBe((LiveGroups.Ops, "liability-changed"));
+    }
+
+    [Fact]
+    public void A_risk_alert_naming_customers_never_reaches_a_customer() =>
+        DeltaRouter.Alert(new RiskAlertV1(Guid.NewGuid(), RiskAlertKind.RepeatedBet, "f-1", "home", [Owner], [Guid.NewGuid()], new Money(3_000, "ZAR"), "x", DateTimeOffset.UtcNow))
+            .Groups.ShouldNotContain(LiveGroups.Punter(Owner));
 }

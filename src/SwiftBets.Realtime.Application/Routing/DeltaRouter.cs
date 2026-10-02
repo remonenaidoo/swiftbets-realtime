@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Risk;
 using SwiftBets.Contracts.Casino;
 using SwiftBets.Contracts.Offer;
 using SwiftBets.Contracts.Payout;
@@ -39,6 +40,12 @@ public static class DeltaRouter
 
     public static Route Settled(CouponSettledV2 settled) =>
         new([LiveGroups.Ops, LiveGroups.Punter(settled.PunterId)], "coupon-settled", settled);
+
+    /// <summary>A fixture's liability for the trader view; operators only, never customers.</summary>
+    public static Route Liability(LiabilityChangedV1 liability) => new([LiveGroups.Ops], "liability-changed", liability);
+
+    /// <summary>A betting pattern for the trader view; it names customers, so only operators receive it.</summary>
+    public static Route Alert(RiskAlertV1 alert) => new([LiveGroups.Ops], "risk-alert", alert);
 
     /// <summary>Casino play moved the player's wallet; only that player is told, so their balance refreshes.</summary>
     public static Route CasinoMoved(CasinoTransactionV1 transaction) =>
