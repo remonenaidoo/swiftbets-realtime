@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Casino;
 using SwiftBets.Contracts.Offer;
 using SwiftBets.Contracts.Payout;
 using SwiftBets.Contracts.Placement;
@@ -38,6 +39,10 @@ public static class DeltaRouter
 
     public static Route Settled(CouponSettledV2 settled) =>
         new([LiveGroups.Ops, LiveGroups.Punter(settled.PunterId)], "coupon-settled", settled);
+
+    /// <summary>Casino play moved the player's wallet; only that player is told, so their balance refreshes.</summary>
+    public static Route CasinoMoved(CasinoTransactionV1 transaction) =>
+        new([LiveGroups.Punter(transaction.PunterId)], "balance-changed", new { transaction.Kind });
 
     public static Route Paid(PayoutCompletedV1 paid) =>
         new([LiveGroups.Ops, LiveGroups.Punter(paid.PunterId)], "payout-completed", paid);
