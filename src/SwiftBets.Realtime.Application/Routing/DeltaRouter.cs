@@ -18,13 +18,25 @@ public static class DeltaRouter
     public static Route FixtureChanged(FixtureChangedV1 fixture) =>
         new([LiveGroups.Offer, LiveGroups.Fixture(fixture.FixtureId)], "fixture-changed", fixture);
 
-    public static Route Placed(CouponPlacedV1 placed) =>
-        new([LiveGroups.Ops, LiveGroups.Punter(placed.PunterId), .. placed.Legs.Select(l => l.FixtureId).Distinct().Select(LiveGroups.Fixture)], "coupon-placed", placed);
+    /// <summary>Carries the V1 summary fields (bet type, total odds, stake) the operator feed shows, plus the V2 bets.</summary>
+    public static Route Placed(CouponPlacedV2 placed) =>
+        new([LiveGroups.Ops, LiveGroups.Punter(placed.PunterId), .. placed.Legs.Select(l => l.FixtureId).Distinct().Select(LiveGroups.Fixture)], "coupon-placed", new
+        {
+            placed.CouponId,
+            placed.PunterId,
+            BetType = placed.Bets.Count != 1 || placed.Bets[0].Lines != 1 || placed.Legs.Any(l => l.IsBanker) ? "system" : placed.Legs.Count == 1 ? "single" : "accumulator",
+            TotalOdds = placed.TotalStake.MinorUnits == 0 ? 0m : decimal.Round((decimal)placed.PotentialPayout.MinorUnits / placed.TotalStake.MinorUnits, 2, MidpointRounding.ToZero),
+            Stake = placed.TotalStake,
+            placed.PotentialPayout,
+            placed.Legs,
+            placed.Bets,
+            placed.PlacedAt,
+        });
 
     public static Route Rejected(CouponRejectedV1 rejected) =>
         new([LiveGroups.Ops, LiveGroups.Punter(rejected.PunterId)], "coupon-rejected", rejected);
 
-    public static Route Settled(CouponSettledV1 settled) =>
+    public static Route Settled(CouponSettledV2 settled) =>
         new([LiveGroups.Ops, LiveGroups.Punter(settled.PunterId)], "coupon-settled", settled);
 
     public static Route Paid(PayoutCompletedV1 paid) =>

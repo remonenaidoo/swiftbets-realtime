@@ -34,9 +34,9 @@ public static class InfrastructureRegistration
             // Live views only care about now: new groups start at the latest offset (D68). The group id is per
             // deployment, not per replica, so each event is pushed once and the Redis backplane fans it out.
             Observe<FixtureChangedV1>(services, Topics.FixtureChanged, DeltaRouter.FixtureChanged);
-            Observe<CouponPlacedV1>(services, Topics.CouponPlaced, DeltaRouter.Placed);
+            Observe<CouponPlacedV2>(services, Topics.CouponPlacedV2, DeltaRouter.Placed);
             Observe<CouponRejectedV1>(services, Topics.CouponRejected, DeltaRouter.Rejected);
-            Observe<CouponSettledV1>(services, Topics.CouponSettled, DeltaRouter.Settled);
+            Observe<CouponSettledV2>(services, Topics.CouponSettledV2, DeltaRouter.Settled);
             Observe<PayoutCompletedV1>(services, Topics.PayoutCompleted, DeltaRouter.Paid);
             Observe<StuckCouponV1>(services, Topics.StuckCoupon, DeltaRouter.Stuck);
             Observe<PayoutAttemptV1>(services, Topics.PayoutDeadLetter, DeltaRouter.PayoutDeadLettered);

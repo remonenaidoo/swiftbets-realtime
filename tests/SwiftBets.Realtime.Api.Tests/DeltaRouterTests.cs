@@ -19,8 +19,11 @@ public sealed class DeltaRouterTests
     public void Settlement_never_reaches_another_punter() =>
         DeltaRouter.Settled(Settled()).Groups.ShouldNotContain(LiveGroups.Punter(Guid.NewGuid()));
 
-    private static CouponSettledV1 Settled() =>
-        new(Guid.NewGuid(), Owner, 1, CouponOutcome.Won, new Money(100, "ZAR"), 2.5m, new Money(250, "ZAR"), DateTimeOffset.UtcNow);
+    private static CouponSettledV2 Settled() =>
+        new(Guid.NewGuid(), Owner, 1, CouponOutcome.Won, new Money(100, "ZAR"), new Money(250, "ZAR"), [], DateTimeOffset.UtcNow);
+
+    [Fact]
+    public void A_v2_settlement_keeps_its_delta_type() => DeltaRouter.Settled(Settled()).Type.ShouldBe("coupon-settled");
 
     [Fact]
     public void A_rejected_manual_result_reaches_operators_only()
