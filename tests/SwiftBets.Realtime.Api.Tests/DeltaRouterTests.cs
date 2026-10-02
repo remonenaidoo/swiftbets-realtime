@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Casino;
 using SwiftBets.Contracts.Money;
 using System.Text.Json;
 using SwiftBets.Contracts.Offer;
@@ -62,4 +63,20 @@ public sealed class DeltaRouterTests
     [Fact]
     public void A_clawback_or_nothing_to_pay_never_reaches_the_public_ticker() =>
         DeltaRouter.PublicWin(new PayoutCompletedV1(Guid.NewGuid(), Guid.NewGuid(), 2, new Money(-500, "ZAR"), new Money(0, "ZAR"), DateTimeOffset.UtcNow)).ShouldBeNull();
+
+    [Fact]
+    public void Casino_play_tells_only_that_player_their_balance_changed()
+    {
+        var route = DeltaRouter.CasinoMoved(Casino());
+
+        route.Type.ShouldBe("balance-changed");
+        route.Groups.ShouldBe([LiveGroups.Punter(Owner)]);
+    }
+
+    [Fact]
+    public void Casino_play_never_reaches_the_ops_feed_or_another_player() =>
+        DeltaRouter.CasinoMoved(Casino()).Groups.ShouldNotContain(LiveGroups.Ops);
+
+    private static CasinoTransactionV1 Casino() =>
+        new(Guid.NewGuid(), "sim-seamless", "b-1", "r-1", Owner, "sun-temple", CasinoTransactionKind.Bet, new Money(100, "ZAR"), DateTimeOffset.UtcNow);
 }
