@@ -3,6 +3,7 @@ using SwiftBets.Contracts.Payout;
 using SwiftBets.Contracts.Placement;
 using SwiftBets.Contracts.Settlement;
 using SwiftBets.Contracts.Steward;
+using SwiftBets.Contracts.Trading;
 using SwiftBets.Realtime.Domain;
 
 namespace SwiftBets.Realtime.Application.Routing;
@@ -32,6 +33,12 @@ public static class DeltaRouter
     public static Route Stuck(StuckCouponV1 stuck) => new([LiveGroups.Ops], "stuck-coupon", stuck);
 
     public static Route PayoutDeadLettered(PayoutAttemptV1 attempt) => new([LiveGroups.Ops], "payout-dead-lettered", attempt);
+
+    /// <summary>A market suspended or reopened outside the feed: operators see it on the trading view.</summary>
+    public static Route MarketStatusChanged(MarketStatusChangedV1 change) => new([LiveGroups.Ops], "market-status-changed", change);
+
+    /// <summary>Settlement refused a trader's result for one coupon, for example because it was cashed out.</summary>
+    public static Route ManualResultRejected(ManualResultRejectedV1 rejected) => new([LiveGroups.Ops], "manual-result-rejected", rejected);
 
     public static Route IncidentRaised(IncidentRaisedV1 raised) => new([LiveGroups.Ops], "incident-raised", raised);
 

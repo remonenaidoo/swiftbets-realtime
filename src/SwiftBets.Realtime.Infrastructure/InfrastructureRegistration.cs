@@ -12,6 +12,7 @@ using SwiftBets.Contracts.Payout;
 using SwiftBets.Contracts.Placement;
 using SwiftBets.Contracts.Settlement;
 using SwiftBets.Contracts.Steward;
+using SwiftBets.Contracts.Trading;
 using SwiftBets.Realtime.Application.Ports;
 using SwiftBets.Realtime.Application.Routing;
 using SwiftBets.Realtime.Domain;
@@ -39,6 +40,8 @@ public static class InfrastructureRegistration
             Observe<PayoutCompletedV1>(services, Topics.PayoutCompleted, DeltaRouter.Paid);
             Observe<StuckCouponV1>(services, Topics.StuckCoupon, DeltaRouter.Stuck);
             Observe<PayoutAttemptV1>(services, Topics.PayoutDeadLetter, DeltaRouter.PayoutDeadLettered);
+            Observe<MarketStatusChangedV1>(services, Topics.MarketStatusChanged, DeltaRouter.MarketStatusChanged);
+            Observe<ManualResultRejectedV1>(services, Topics.ManualResultRejected, DeltaRouter.ManualResultRejected);
             Observe<IncidentRaisedV1>(services, Topics.IncidentRaised, DeltaRouter.IncidentRaised);
             Observe<IncidentUpdatedV1>(services, Topics.IncidentUpdated, DeltaRouter.IncidentUpdated);
             Observe<RemediationExecutedV1>(services, Topics.RemediationExecuted, DeltaRouter.RemediationExecuted);
