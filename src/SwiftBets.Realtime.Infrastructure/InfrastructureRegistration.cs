@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Risk;
 using SwiftBets.Contracts.Casino;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,8 @@ public static class InfrastructureRegistration
             Observe<CouponRejectedV1>(services, Topics.CouponRejected, DeltaRouter.Rejected);
             Observe<CouponSettledV2>(services, Topics.CouponSettledV2, DeltaRouter.Settled);
             Observe<PayoutCompletedV1>(services, Topics.PayoutCompleted, p => [DeltaRouter.Paid(p), DeltaRouter.PublicWin(p)]);
+            Observe<LiabilityChangedV1>(services, Topics.LiabilityChanged, DeltaRouter.Liability);
+            Observe<RiskAlertV1>(services, Topics.RiskAlert, DeltaRouter.Alert);
             Observe<CasinoTransactionV1>(services, Topics.CasinoTransaction, DeltaRouter.CasinoMoved);
             Observe<StuckCouponV1>(services, Topics.StuckCoupon, DeltaRouter.Stuck);
             Observe<PayoutAttemptV1>(services, Topics.PayoutDeadLetter, DeltaRouter.PayoutDeadLettered);
