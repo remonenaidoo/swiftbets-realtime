@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Notifications;
 using SwiftBets.Contracts.Risk;
 using SwiftBets.Contracts.Casino;
 using SwiftBets.Contracts.Offer;
@@ -40,6 +41,9 @@ public static class DeltaRouter
 
     public static Route Settled(CouponSettledV2 settled) =>
         new([LiveGroups.Ops, LiveGroups.Punter(settled.PunterId)], "coupon-settled", settled);
+
+    /// <summary>A new message in one customer's inbox; only that customer receives it.</summary>
+    public static Route Inbox(InboxMessageV1 message) => new([LiveGroups.Punter(message.UserId)], "inbox-message", message);
 
     /// <summary>A fixture's liability for the trader view; operators only, never customers.</summary>
     public static Route Liability(LiabilityChangedV1 liability) => new([LiveGroups.Ops], "liability-changed", liability);
