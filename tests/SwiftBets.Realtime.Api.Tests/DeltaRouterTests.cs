@@ -1,3 +1,4 @@
+using SwiftBets.Contracts.Notifications;
 using SwiftBets.Contracts.Risk;
 using SwiftBets.Contracts.Casino;
 using SwiftBets.Contracts.Money;
@@ -93,4 +94,16 @@ public sealed class DeltaRouterTests
     public void A_risk_alert_naming_customers_never_reaches_a_customer() =>
         DeltaRouter.Alert(new RiskAlertV1(Guid.NewGuid(), RiskAlertKind.RepeatedBet, "f-1", "home", [Owner], [Guid.NewGuid()], new Money(3_000, "ZAR"), "x", DateTimeOffset.UtcNow))
             .Groups.ShouldNotContain(LiveGroups.Punter(Owner));
+
+    [Fact]
+    public void An_inbox_message_reaches_only_its_customer()
+    {
+        var route = DeltaRouter.Inbox(new InboxMessageV1(Guid.NewGuid(), Owner, "bet-settled", "Your bet won", "x", DateTimeOffset.UtcNow));
+
+        (route.Groups.ShouldHaveSingleItem(), route.Type).ShouldBe((LiveGroups.Punter(Owner), "inbox-message"));
+    }
+
+    [Fact]
+    public void An_inbox_message_never_reaches_the_ops_feed() =>
+        DeltaRouter.Inbox(new InboxMessageV1(Guid.NewGuid(), Owner, "bet-settled", "t", "b", DateTimeOffset.UtcNow)).Groups.ShouldNotContain(LiveGroups.Ops);
 }
